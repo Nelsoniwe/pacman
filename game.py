@@ -1,5 +1,6 @@
 import pygame
 from pygame.constants import RESIZABLE
+from pygame.surfarray import array2d
 from player import Player
 from objects import *
 import random
@@ -12,6 +13,7 @@ YELLOW = (255,255,0)
 
 class Game(object):
     def __init__(self):
+        self.lock = True
         self.font = pygame.font.Font(None,40)
         # Create the player
         self.player = Player(32,128,"player.png")
@@ -46,6 +48,8 @@ class Game(object):
                     self.player = Player(j*32,i*32,"player.png")
                 if item == 3:
                     self.enemies.add(Ghost(j*32,i*32))
+
+        
 
     def input_handler(self):
         if self.game_over == True:
@@ -115,11 +119,16 @@ class Game(object):
          food = (item.rect)
          break
 
-        arr = algorithms.findPathBFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-        for item in arr:
-            # pygame.draw.line(screen, BLUE , [item[1]*32+32, item[0]*32+32], [item[1]*32,item[0]*32], 3)
-            # pygame.draw.ellipse(screen,BLUE, pygame.(point[1]*32 + 9, point[0]*32 + 9, 16, 16)))
-            pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+
+        
+        if(self.lock):
+            arrb = algorithms.findPathBFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+            arra = algorithms.findPathDFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+            for item in arra:
+                pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+            for item in arrb:
+                pygame.draw.rect(screen, YELLOW, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+        # self.lock = False
 
         #update screen
         pygame.display.flip()
