@@ -2,6 +2,7 @@ import pygame
 from pygame.constants import RESIZABLE
 from player import Player
 from objects import *
+import random
 SCREEN_WIDTH = 608
 SCREEN_HEIGHT = 544
 
@@ -18,24 +19,33 @@ class Game(object):
         self.blocks_group = pygame.sprite.Group()
         # Create a group for the food
         self.dots_group = pygame.sprite.Group()
+        # Create a group for the ghosts
+        self.enemies = pygame.sprite.Group()
 
         for i,row in enumerate(test_grid):
             for j,item in enumerate(row):
                 if item == 0:
                     self.blocks_group.add(Block(j*32+4,i*32+4,BLUE,24,24))
 
-        # Create the ghosts
-        self.enemies = pygame.sprite.Group()
-        self.enemies.add(Ghost(224,256))
-        self.enemies.add(Ghost(256,256))
-        self.enemies.add(Ghost(288,256))
-        self.enemies.add(Ghost(256,224))
-        
+        #count of patch cells
+        pathcellcount = 0
+        for i, row in enumerate(test_grid):
+            for j, item in enumerate(row):
+                if item != 0:
+                    pathcellcount=pathcellcount+1
+        a = random.randrange(0,pathcellcount)
+
         # Add the food
         for i, row in enumerate(test_grid):
             for j, item in enumerate(row):
                 if item != 0:
-                    self.dots_group.add(Ellipse(j*32+12,i*32+12,YELLOW,8,8))
+                    a-=1
+                    if a == 0:
+                        self.dots_group.add(Ellipse(j*32+12,i*32+12,YELLOW,8,8))
+                if item == 2:
+                    self.player = Player(j*32,i*32,"player.png")
+                if item == 3:
+                    self.enemies.add(Ghost(j*32,i*32))
 
     def input_handler(self):
         if self.game_over == True:
@@ -83,6 +93,7 @@ class Game(object):
                 self.player.explosion = True
             self.game_over = self.player.game_over
 
+
     def display_frame(self,screen):
         #clear screen from previous frame
         screen.fill(BLACK)
@@ -96,5 +107,19 @@ class Game(object):
         self.enemies.draw(screen)
         #draw player on field
         screen.blit(self.player.image,self.player.rect)
+
+        # print(self.dots_group[0].rect)
+        
+
+        for item in self.dots_group:
+         food = (item.rect)
+         break
+
+        arr = algorithms.findPathBFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+        for item in arr:
+            # pygame.draw.line(screen, BLUE , [item[1]*32+32, item[0]*32+32], [item[1]*32,item[0]*32], 3)
+            # pygame.draw.ellipse(screen,BLUE, pygame.(point[1]*32 + 9, point[0]*32 + 9, 16, 16)))
+            pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+
         #update screen
         pygame.display.flip()

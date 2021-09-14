@@ -13,6 +13,7 @@ def main():
     #fps variable
     clock = pygame.time.Clock()
     # Create a game object
+    
     game = Game()
     game.__init__()
     game.game_over = False
