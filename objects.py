@@ -1,15 +1,15 @@
 import pygame
 import algorithms
 
-SCREEN_WIDTH = 608
-SCREEN_HEIGHT = 544
+SCREENWIDTH = 608
+SCREENHEIGHT = 544
 
 # Define some colors
 BLACK = (0,0,0)
 BLUE = (0,0,255)
 
 #game field
-test_grid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+testGrid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
                  (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,),
@@ -30,8 +30,8 @@ test_grid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
 
 #environment hight and width
-envhight = len(test_grid)
-envwidth = len(test_grid[0])
+envHight = len(testGrid)
+envWidth = len(testGrid[0])
 
 #Block that keep player in playfield
 class Block(pygame.sprite.Sprite):
@@ -63,23 +63,23 @@ class Ghost(pygame.sprite.Sprite):
         self.rect.topleft = (x,y)
     
 #Draw walls
-def test_draw_enviroment(screen):
-    for i,row in enumerate(test_grid):
+def testDrawEnviroment(screen):
+    for i,row in enumerate(testGrid):
         for j,item in enumerate(row):
             if item == 1 or item == 2 or item == 3:
-                if(j+1< envwidth and test_grid[i][j+1]==0):
+                if(j+1< envWidth and testGrid[i][j+1]==0):
                     pygame.draw.line(screen, BLUE , [j*32+32, i*32+32], [j*32+32,i*32], 3)
-                elif(j+1== envwidth):
+                elif(j+1== envWidth):
                     pygame.draw.line(screen, BLUE , [j*32+32, i*32+32], [j*32+32,i*32], 3)
-                if(test_grid[i][j-1]==0):
+                if(testGrid[i][j-1]==0):
                     pygame.draw.line(screen, BLUE , [j*32, i*32], [j*32,i*32+32], 3)
                 elif(j==0):
                     pygame.draw.line(screen, BLUE , [j*32, i*32], [j*32,i*32+32], 3)
-                if(i+1< envhight and test_grid[i+1][j]==0):
+                if(i+1< envHight and testGrid[i+1][j]==0):
                     pygame.draw.line(screen, BLUE , [j*32+32, i*32+32], [j*32,i*32+32], 3)
-                elif(i+1 == envhight):
+                elif(i+1 == envHight):
                     pygame.draw.line(screen, BLUE , [j*32+32, i*32+32], [j*32,i*32+32], 3)
-                if( test_grid[i-1][j]==0):
+                if( testGrid[i-1][j]==0):
                     pygame.draw.line(screen, BLUE , [j*32, i*32], [j*32+32,i*32], 3)
                 elif(i==0):
                     pygame.draw.line(screen, BLUE , [j*32, i*32], [j*32+32,i*32], 3)

@@ -4,8 +4,8 @@ from pygame.surfarray import array2d
 from player import Player
 from objects import *
 import random
-SCREEN_WIDTH = 608
-SCREEN_HEIGHT = 544
+SCREENWIDTH = 608
+SCREENHEIGHT = 544
 
 WHITE = (255,255,255)
 BLUE = (0,0,255)
@@ -18,32 +18,32 @@ class Game(object):
         # Create the player
         self.player = Player(32,128,"player.png")
         # Create a group for the blocks
-        self.blocks_group = pygame.sprite.Group()
+        self.blocksGroup = pygame.sprite.Group()
         # Create a group for the food
-        self.dots_group = pygame.sprite.Group()
+        self.dotsGroup = pygame.sprite.Group()
         # Create a group for the ghosts
         self.enemies = pygame.sprite.Group()
 
-        for i,row in enumerate(test_grid):
+        for i,row in enumerate(testGrid):
             for j,item in enumerate(row):
                 if item == 0:
-                    self.blocks_group.add(Block(j*32+4,i*32+4,BLUE,24,24))
+                    self.blocksGroup.add(Block(j*32+4,i*32+4,BLUE,24,24))
 
         #count of patch cells
-        pathcellcount = 0
-        for i, row in enumerate(test_grid):
+        pathCellCount = 0
+        for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item != 0:
-                    pathcellcount=pathcellcount+1
-        a = random.randrange(0,pathcellcount)
+                    pathCellCount=pathCellCount+1
+        a = random.randrange(0,pathCellCount)
 
         # Add the food
-        for i, row in enumerate(test_grid):
+        for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item != 0:
                     a-=1
                     if a == 0:
-                        self.dots_group.add(Ellipse(j*32+12,i*32+12,YELLOW,8,8))
+                        self.dotsGroup.add(Ellipse(j*32+12,i*32+12,YELLOW,8,8))
                 if item == 2:
                     self.player = Player(j*32,i*32,"player.png")
                 if item == 3:
@@ -51,8 +51,8 @@ class Game(object):
 
         
 
-    def input_handler(self):
-        if self.game_over == True:
+    def inputHandler(self):
+        if self.gameOver == True:
             return True
         # User did something
         for event in pygame.event.get():
@@ -60,25 +60,25 @@ class Game(object):
                 return True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    self.player.move_right()
+                    self.player.moveRight()
                 elif event.key == pygame.K_LEFT:
-                    self.player.move_left()
+                    self.player.moveLeft()
                 elif event.key == pygame.K_UP:
-                    self.player.move_up()
+                    self.player.moveUp()
                 elif event.key == pygame.K_DOWN:
-                    self.player.move_down()
+                    self.player.moveDown()
                 elif event.key == pygame.K_ESCAPE:
-                    self.game_over = True
+                    self.gameOver = True
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
-                    self.player.stop_move_right()
+                    self.player.stopMoveRight()
                 elif event.key == pygame.K_LEFT:
-                    self.player.stop_move_left()
+                    self.player.stopMoveLeft()
                 elif event.key == pygame.K_UP:
-                    self.player.stop_move_up()
+                    self.player.stopMoveUp()
                 elif event.key == pygame.K_DOWN:
-                    self.player.stop_move_down()
+                    self.player.stopMoveDown()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.player.explosion = True
@@ -86,49 +86,44 @@ class Game(object):
         return False
 
     def logic(self):
-        if not self.game_over:
-            self.player.update(self.blocks_group)
+        if not self.gameOver:
+            self.player.update(self.blocksGroup)
             #detecting colide with ghost or food
-            block_hit_list = pygame.sprite.spritecollide(self.player,self.dots_group,True)
-            block_hit_list = pygame.sprite.spritecollide(self.player,self.enemies,False)
-            if len(block_hit_list) > 0:
+            blockHitList = pygame.sprite.spritecollide(self.player,self.dotsGroup,True)
+            blockHitList = pygame.sprite.spritecollide(self.player,self.enemies,False)
+            if len(blockHitList) > 0:
                 self.player.explosion = True
-            if len(self.dots_group)==0:
+            if len(self.dotsGroup)==0:
                 self.player.explosion = True
-            self.game_over = self.player.game_over
+            self.gameOver = self.player.gameOver
 
 
-    def display_frame(self,screen):
+    def displayFrame(self,screen):
         #clear screen from previous frame
         screen.fill(BLACK)
-        #draw blocks
-        #self.blocks_group.draw(screen)
         #draw walls
-        test_draw_enviroment(screen)
+        testDrawEnviroment(screen)
         #draw food
-        self.dots_group.draw(screen)
+        self.dotsGroup.draw(screen)
         #draw ghosts
         self.enemies.draw(screen)
         #draw player on field
         screen.blit(self.player.image,self.player.rect)
-
-        # print(self.dots_group[0].rect)
         
 
-        for item in self.dots_group:
+        for item in self.dotsGroup:
          food = (item.rect)
          break
-
-
         
         if(self.lock):
-            arrb = algorithms.findPathBFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            arra = algorithms.findPathDFS(algorithms.test_grid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            for item in arra:
-                pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
-            for item in arrb:
-                pygame.draw.rect(screen, YELLOW, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
-        # self.lock = False
+            # arrb = algorithms.findPathBFS(algorithms.testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+            arra = algorithms.findPathDFS(algorithms.testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+        self.lock = False
+        for item in arra:
+            pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+            # for item in arrb:
+            #     pygame.draw.rect(screen, YELLOW, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+        
 
         #update screen
         pygame.display.flip()

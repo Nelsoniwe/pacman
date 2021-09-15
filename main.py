@@ -15,14 +15,14 @@ def main():
     # Create a game object
     game = Game()
     game.__init__()
-    game.game_over = False
+    game.gameOver = False
     #game 
     while not done:
         #input handler
-        done = game.input_handler()
+        done = game.inputHandler()
         game.logic()
         #draw frame
-        game.display_frame(screen)
+        game.displayFrame(screen)
         #30 frames per second
         clock.tick(30)
     pygame.quit()

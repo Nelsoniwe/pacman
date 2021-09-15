@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-test_grid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+testGrid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
                  (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,),
@@ -22,17 +22,17 @@ test_grid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
 
 #class BFS(object):
-def findPathBFS(maze,startx,starty,endx,endy):
+def findPathBFS(maze,startX,startY,endX,endY):
     startTime = datetime.now()
-    startx = int(startx)
-    starty = int(starty)
-    endx = int(endx)
-    endy = int(endy)
+    startX = int(startX)
+    startY = int(startY)
+    endX = int(endX)
+    endY = int(endY)
 
     queue = []
-    queue.append((startx,starty))
-    envhight = len(test_grid)
-    envwidth = len(test_grid[0])
+    queue.append((startX,startY))
+    envHight = len(testGrid)
+    envWidth = len(testGrid[0])
     Dir = [[-1, 0], [0, -1], [1, 0],[0, 1]]
     weight = 1
 
@@ -45,15 +45,15 @@ def findPathBFS(maze,startx,starty,endx,endy):
             else:
                 visited[-1].append(True)
 
-    visited[startx][starty] = 1
-    oldcount = 1
+    visited[startX][startY] = 1
+    oldCount = 1
     newCount = 0
     while len(queue)>0:
         
         p = queue[0]
         queue.pop(0)
 
-        if (p[0] == endx and p[1]== endy):
+        if (p[0] == endX and p[1]== endY):
             endTime = datetime.now()
             print('time of work BFS:', endTime - startTime)
             print('path:', queue)
@@ -65,28 +65,28 @@ def findPathBFS(maze,startx,starty,endx,endy):
             b = p[1] + Dir[item][1]
 
             # not blocked and valid
-            if(a >= 0 and b >= 0 and a < envhight and b < envwidth and visited[a][b] == 0 and visited[a][b] != True) :       
+            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and visited[a][b] == 0 and visited[a][b] != True) :       
                 visited[a][b]= weight + 1   
                 queue.append((a, b))
                 newCount += 1
         
-        oldcount -= 1
-        if(oldcount <= 0):
-            oldcount = newCount
+        oldCount -= 1
+        if(oldCount <= 0):
+            oldCount = newCount
             newCount = 0
             weight+=1
     
     return queue
 
 #DFS algorithm
-def findPathDFS(maze,startx,starty,endx,endy):
+def findPathDFS(maze,startX,startY,endX,endY):
     startTime = datetime.now()
-    startx = int(startx)
-    starty = int(starty)
-    endx = int(endx)
-    endy = int(endy)
+    startX = int(startX)
+    startY = int(startY)
+    endX = int(endX)
+    endY = int(endY)
 
-    allpath = []
+    allPath = []
     queue = []
 
     visited = []
@@ -98,105 +98,101 @@ def findPathDFS(maze,startx,starty,endx,endy):
             else:
                 visited[-1].append(1)
  
-    go_to(startx,starty,endx,endy,visited,queue,allpath)
+    goTo(startX,startY,endX,endY,visited,queue,allPath)
     endTime = datetime.now()
     print('time of work DFS:', endTime - startTime)
-    print('path:', allpath[0])
-    return allpath[0]
+    print('path:', allPath[0])
+    return allPath[0]
 
 #DFS algorithm
-def go_to(startx,starty,endx,endy,visited,queue,allpath):
+def goTo(startX,startY,endX,endY,visited,queue,allPath):
     queue, visited
-    if startx < 0 or starty < 0 or startx > len(visited)-1 or starty > len(visited[0])-1:
+    if startX < 0 or startY < 0 or startX > len(visited)-1 or startY > len(visited[0])-1:
         return
-    if (startx, starty) in queue or visited[startx][starty] > 0:
+    if (startX, startY) in queue or visited[startX][startY] > 0:
         return
-    queue.append((startx, starty))
-    visited[startx][starty] = 2
-    if (startx, starty) == (endx, endy):
-        allpath.append(queue.copy())
+    queue.append((startX, startY))
+    visited[startX][startY] = 2
+    if (startX, startY) == (endX, endY):
+        allPath.append(queue.copy())
         queue.pop()
         return
     else:
-        go_to(startx - 1, starty,endx,endy,visited,queue,allpath)  # up
-        go_to(startx + 1, starty,endx,endy,visited,queue,allpath)  # down
-        go_to(startx, starty + 1,endx,endy,visited,queue,allpath)  # right
-        go_to(startx, starty - 1,endx,endy,visited,queue,allpath)  # left
+        goTo(startX - 1, startY,endX,endY,visited,queue,allPath)  # up
+        goTo(startX + 1, startY,endX,endY,visited,queue,allPath)  # down
+        goTo(startX, startY + 1,endX,endY,visited,queue,allPath)  # right
+        goTo(startX, startY - 1,endX,endY,visited,queue,allPath)  # left
     queue.pop()
     return
 
-# def UCS(maze,startx,starty,endx,endy):
-    startx = int(startx)
-    starty = int(starty)
-    endx = int(endx)
-    endy = int(endy)
+def UCS(maze,startX,startY,endX,endY):
+    startX = int(startX)
+    startY = int(startY)
+    endX = int(endX)
+    endY = int(endY)
 
     queue = []
-    queueweight = []
+    queueWeight = []
 
-    field,visited = randomizeweights(maze)
-    queue.append((startx,starty))
-    queueweight.append(0)
+    field,visited = randomizeWeights(maze)
+    queue.append((startX,startY))
+    queueWeight.append(0)
 
-    for i in range(len(field)):
-        print(field[i])
+    # for i in range(len(field)):
+    #     print(field[i])
 
     startNode = None
-    Nodelist = []
-    Nodelist.append(startNode)
+    nodeList = []
+    nodeList.append(startNode)
     a = []
-    print(queue[0][0])
+    #print(queue[0][0])
     while len(queue)>0:
         startNode = Node(node[0],node[1],startNode)
-        min_index = queueweight.index(min(queueweight))
-        node = queue.pop(min_index)
+        minIndex = queueWeight.index(min(queueWeight))
+        node = queue.pop(minIndex)
         
         visited[node[0]][node[1]] = 1
         
         # startNode = Node(pathNode.X,pathNode.Y,pathNode.Node)
-        Nodelist.append(startNode)
+        nodeList.append(startNode)
 
-        if node[0] == endx and node[1] == endy:
-            print(startNode.name(a))
+        #if we find endpoint
+        if node[0] == endX and node[1] == endY:
+            # print(startNode.name(a))
             break
-        weightnode = queueweight.pop(min_index)
-
-        
+        weightNode = queueWeight.pop(minIndex)
 
         he = []   
         heind = []
         if node[0]-2>=0 and visited[node[0]-2][node[1]] != 1:
             he.append((node[0]-2,node[1]))
-            heind.append(weightnode+field[node[0]-1][node[1]])
+            heind.append(weightNode+field[node[0]-1][node[1]])
         if node[1]-2>=0 and visited[node[0]][node[1]-2] != 1:
             he.append((node[0],node[1]-2))
-            heind.append(weightnode+field[node[0]][node[1]-1])
+            heind.append(weightNode+field[node[0]][node[1]-1])
         if node[0]+2<len(field) and visited[node[0]+2][node[1]] != 1:
             he.append((node[0]+2,node[1]))
-            heind.append(weightnode+field[node[0]+1][node[1]])
+            heind.append(weightNode+field[node[0]+1][node[1]])
         if node[1]+2<len(field[0]) and visited[node[0]][node[1]+2] != 1:
             he.append((node[0],node[1]+2))
-            heind.append(weightnode+field[node[0]][node[1]+1])
+            heind.append(weightNode+field[node[0]][node[1]+1])
         
 
         while len(he)>0:
             
-            min_index = heind.index(min(heind))
-            tempNode = he.pop(min_index)
+            minIndex = heind.index(min(heind))
+            tempNode = he.pop(minIndex)
             queue.append(tempNode)
-            queueweight.append(heind.pop(min_index))
+            queueWeight.append(heind.pop(minIndex))
             
-    
-
-
-    #back to normal array
+    # back to normal array
     a = []
     for item in queue:
      hehe = queue.pop()
      a.append((int(hehe[0]/2),int(hehe[1]/2)))
     queue = a
     print(queue)
-    print(queueweight)
+    print(queueWeight)
     for i in range(len(visited)-1):
         if i % 2 == 0:
             print()
@@ -207,37 +203,37 @@ def go_to(startx,starty,endx,endy,visited,queue,allpath):
     for i in range(len(visited)):
         print(visited[i])
         
-# def randomizeweights(field):
+def randomizeWeights(field):
     newField = []
-    visitedfieldbig = []
+    visitedFieldBig = []
     r = random
 
     for i in range(len(field)*2 - 1):
         row = []
-        clearrow = []
+        clearRow = []
         for j in range(len(field[0])*2 - 1):
             if (i % 2 == 0) and (j % 2 == 0):
                 row.append(field[int(i/2)][int(j/2)])
                 if(field[int(i/2)][int(j/2)] == 1):
-                    clearrow.append(0)
+                    clearRow.append(0)
                 else:
-                    clearrow.append(1)
+                    clearRow.append(1)
             elif(i % 2 != 0) and (j % 2 != 0):
                 row.append(0)
-                clearrow.append(1)
+                clearRow.append(1)
             else:
                 row.append(random.randint(4,9))
-                clearrow.append(0)
+                clearRow.append(0)
         newField.append(row)
-        visitedfieldbig.append(clearrow)
+        visitedFieldBig.append(clearRow)
 
-    return newField,visitedfieldbig
+    return newField,visitedFieldBig
 
 #reconstruct path to DFS algorithm 
 def reconstructPath(maze,x,y):
     stop = True
-    envhight = len(maze)
-    envwidth = len(maze[0])
+    envHight = len(maze)
+    envWidth = len(maze[0])
     Dir = [[-1, 0], [0, -1], [1, 0],[0, 1]]
     queue = []
     queue.append((x,y))
@@ -262,7 +258,7 @@ def reconstructPath(maze,x,y):
             b = p[1] + Dir[item][1]
 
             # not blocked and valid
-            if(a >= 0 and b >= 0 and a < envhight and b < envwidth and maze[a][b] != 0 and maze[a][b] < maze[p[0]][p[1]]) :           
+            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and maze[a][b] != 0 and maze[a][b] < maze[p[0]][p[1]]) :           
                 queue.append((a, b))
                 #print(maze[a][b])
                 break
@@ -270,7 +266,7 @@ def reconstructPath(maze,x,y):
             stop = False
     return (queue)
 
-# class Node:
+class Node:
     def __init__(self, x, y, bNode = None):
         self.X = x
         self.Y = y
@@ -284,19 +280,6 @@ def reconstructPath(maze,x,y):
             return b
      
 #trash
-
-# a,b = (randomizeweights(test_grid))
-
-# for i in range(len(b)):
-#         print(b[i])
-# print()
-# for i in range(len(a)):
-#         print(a[i])
-# print(UCS(test_grid,2,0,24,20))
-
-# (findPathDFS(test_grid,2,1,0,0))
-# (findPathBFS(test_grid,2,1,16,16))
-
-# a = Node(1, 2)
-# b = Node(3,4,a)
-# print(b.Node.xStart)
+# print(UCS(testGrid,2,0,24,20))
+# (findPathDFS(testGrid,2,1,0,0))
+# (findPathBFS(testGrid,2,1,16,16))
