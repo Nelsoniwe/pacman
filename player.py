@@ -8,8 +8,8 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 
 class Player(pygame.sprite.Sprite):
-    change_x = 0
-    change_y = 0
+    changeX = 0
+    changeY = 0
     explosion = False
     gameOver = False
     def __init__(self,x,y,filename):
@@ -21,99 +21,99 @@ class Player(pygame.sprite.Sprite):
         # Load image which will be for the animation
         img = pygame.image.load("walk.png").convert()
         # Create the animations objects
-        self.move_right_animation = Animation(img,32,32)
-        self.move_left_animation = Animation(pygame.transform.flip(img,True,False),32,32)
-        self.move_up_animation = Animation(pygame.transform.rotate(img,90),32,32)
-        self.move_down_animation = Animation(pygame.transform.rotate(img,270),32,32)
+        self.moveRightAnimation = Animation(img,32,32)
+        self.moveLeftAnimation = Animation(pygame.transform.flip(img,True,False),32,32)
+        self.moveUpAnimation = Animation(pygame.transform.rotate(img,90),32,32)
+        self.moveDownAnimation = Animation(pygame.transform.rotate(img,270),32,32)
         # Load explosion image
         img = pygame.image.load("explosion.png").convert()
-        self.explosion_animation = Animation(img,30,30)
+        self.explosionAnimation = Animation(img,30,30)
         # Save the player image
-        self.player_image = pygame.image.load(filename).convert()
-        self.player_image.set_colorkey(BLACK)
+        self.playerImage = pygame.image.load(filename).convert()
+        self.playerImage.set_colorkey(BLACK)
 
-    def update(self,blocked_blocks):
+    def update(self,blockedBlocks):
         if not self.explosion:
             # This will stop the user when he touch the block
-            for block in pygame.sprite.spritecollide(self,blocked_blocks,False):
+            for block in pygame.sprite.spritecollide(self,blockedBlocks,False):
                 self.rect.x -= (block.rect.x - self.rect.x)*0.1
                 self.rect.y -= (block.rect.y - self.rect.y)*0.1
-                self.change_x = 0
-                self.change_y = 0
+                self.changeX = 0
+                self.changeY = 0
             
             # This will stop the user when he tries to go outside 
             if self.rect.right < 32:
                 self.rect.x -= (self.rect.x)*0.1
-                self.change_x = 0
-                self.change_y = 0
+                self.changeX = 0
+                self.changeY = 0
             elif self.rect.left > SCREEN_WIDTH-32:
                 self.rect.x -= (SCREEN_WIDTH - self.rect.x)*0.1
-                self.change_x = 0
-                self.change_y = 0
+                self.changeX = 0
+                self.changeY = 0
             if self.rect.bottom < 32:
                 self.rect.y -= (self.rect.y)*0.1
-                self.change_x = 0
-                self.change_y = 0
+                self.changeX = 0
+                self.changeY = 0
             elif self.rect.top > SCREEN_HEIGHT-32:
                 self.rect.y -= (SCREEN_HEIGHT - self.rect.y)*0.1
-                self.change_x = 0
-                self.change_y = 0
-            self.rect.x += self.change_x
-            self.rect.y += self.change_y
+                self.changeX = 0
+                self.changeY = 0
+            self.rect.x += self.changeX
+            self.rect.y += self.changeY
 
             #animate pacman when he moves
-            if self.change_x > 0:
-                self.move_right_animation.update(10)
-                self.image = self.move_right_animation.getCurrentImage()
-            elif self.change_x < 0:
-                self.move_left_animation.update(10)
-                self.image = self.move_left_animation.getCurrentImage()
+            if self.changeX > 0:
+                self.moveRightAnimation.update(10)
+                self.image = self.moveRightAnimation.getCurrentImage()
+            elif self.changeX < 0:
+                self.moveLeftAnimation.update(10)
+                self.image = self.moveLeftAnimation.getCurrentImage()
 
-            if self.change_y > 0:
-                self.move_down_animation.update(10)
-                self.image = self.move_down_animation.getCurrentImage()
-            elif self.change_y < 0:
-                self.move_up_animation.update(10)
-                self.image = self.move_up_animation.getCurrentImage()   
+            if self.changeY > 0:
+                self.moveDownAnimation.update(10)
+                self.image = self.moveDownAnimation.getCurrentImage()
+            elif self.changeY < 0:
+                self.moveUpAnimation.update(10)
+                self.image = self.moveUpAnimation.getCurrentImage()   
         else:
-            if self.explosion_animation.index == self.explosion_animation.get_length() -1:
+            if self.explosionAnimation.index == self.explosionAnimation.get_length() -1:
                 pygame.time.wait(500)
                 self.gameOver = True
-            self.explosion_animation.update(12)
-            self.image = self.explosion_animation.getCurrentImage()
+            self.explosionAnimation.update(12)
+            self.image = self.explosionAnimation.getCurrentImage()
             
 
     def moveRight(self):
-        self.change_x = 3
+        self.changeX = 3
 
     def moveLeft(self):
-        self.change_x = -3
+        self.changeX = -3
 
     def moveUp(self):
-        self.change_y = -3
+        self.changeY = -3
 
     def moveDown(self):
-        self.change_y = 3
+        self.changeY = 3
 
     def stopMoveRight(self):
-        if self.change_x != 0:
-            self.image = self.player_image
-        self.change_x = 0
+        if self.changeX != 0:
+            self.image = self.playerImage
+        self.changeX = 0
 
     def stopMoveLeft(self):
-        if self.change_x != 0:
-            self.image = pygame.transform.flip(self.player_image,True,False)
-        self.change_x = 0
+        if self.changeX != 0:
+            self.image = pygame.transform.flip(self.playerImage,True,False)
+        self.changeX = 0
 
     def stopMoveUp(self):
-        if self.change_y != 0:
-            self.image = pygame.transform.rotate(self.player_image,90)
-        self.change_y = 0
+        if self.changeY != 0:
+            self.image = pygame.transform.rotate(self.playerImage,90)
+        self.changeY = 0
 
     def stopMoveDown(self):
-        if self.change_y != 0:
-            self.image = pygame.transform.rotate(self.player_image,270)
-        self.change_y = 0
+        if self.changeY != 0:
+            self.image = pygame.transform.rotate(self.playerImage,270)
+        self.changeY = 0
 
 
 

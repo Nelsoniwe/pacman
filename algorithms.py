@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-testGrid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
                  (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,),
@@ -21,7 +21,7 @@ testGrid =     ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,),
                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
 
-#class BFS(object):
+#BFS
 def findPathBFS(maze,startX,startY,endX,endY):
     startTime = datetime.now()
     startX = int(startX)

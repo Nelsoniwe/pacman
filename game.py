@@ -115,10 +115,10 @@ class Game(object):
          food = (item.rect)
          break
         
-        if(self.lock):
+        # if(self.lock):
             # arrb = algorithms.findPathBFS(algorithms.testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            arra = algorithms.findPathDFS(algorithms.testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-        self.lock = False
+        arra = algorithms.findPathDFS(algorithms.testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+        # self.lock = False
         for item in arra:
             pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
             # for item in arrb:

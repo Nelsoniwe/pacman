@@ -1,12 +1,12 @@
 import pygame
 from game import Game
 
-SCREEN_WIDTH = 544
-SCREEN_HEIGHT = 608
+SCREENWIDTH = 544
+SCREENHEIGHT = 608
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+    screen = pygame.display.set_mode((SCREENWIDTH,SCREENHEIGHT))
     pygame.display.set_caption("PACMAN")
     #done game variable
     done = False
