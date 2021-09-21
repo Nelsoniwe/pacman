@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+import sys
 
 testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
@@ -125,81 +126,82 @@ def goTo(startX,startY,endX,endY,visited,queue,allPath):
     queue.pop()
     return
 
-def UCS(maze,startX,startY,endX,endY):
-    startX = int(startX)
-    startY = int(startY)
-    endX = int(endX)
-    endY = int(endY)
+def UCS(maze, startX, startY, endX, endY):
+    startX = int(startX)*2
+    startY = int(startY)*2
+    endX = int(endX)*2
+    endY = int(endY)*2
 
-    queue = []
-    queueWeight = []
+    # list of Nodes (with coordinates)
+    nodesList = []
+    # Nodes weights
+    nodesWeightsList = []
 
-    field,visited = randomizeWeights(maze)
-    queue.append((startX,startY))
-    queueWeight.append(0)
+    nodesList.append(Node(startX, startY, None))
+    nodesWeightsList.append(0)
 
-    # for i in range(len(field)):
-    #     print(field[i])
+    # randomize weights for fields
+    field, visited = randomizeWeights(maze)
 
     startNode = None
-    nodeList = []
-    nodeList.append(startNode)
-    a = []
-    #print(queue[0][0])
-    while len(queue)>0:
-        startNode = Node(node[0],node[1],startNode)
-        minIndex = queueWeight.index(min(queueWeight))
-        node = queue.pop(minIndex)
-        
-        visited[node[0]][node[1]] = 1
-        
+    # nodeList = []
+    # nodeList.append(startNode)
+
+    while len(nodesList) > 0:
+        minIndex = nodesWeightsList.index(min(nodesWeightsList))
+        node = nodesList[minIndex]
+        weightNode = nodesWeightsList[minIndex]
+        nodesWeightsList[minIndex] = sys.maxsize
+
+        startNode = Node(node.X, node.Y, startNode)
+        visited[node.X][node.Y] = 1
+
         # startNode = Node(pathNode.X,pathNode.Y,pathNode.Node)
-        nodeList.append(startNode)
+        # nodeList.append(startNode)
 
-        #if we find endpoint
-        if node[0] == endX and node[1] == endY:
-            # print(startNode.name(a))
-            break
-        weightNode = queueWeight.pop(minIndex)
+        # if we find endpoint
+        if node.X == endX and node.Y == endY:
+            return reconstructPathForUCS(node)
 
-        he = []   
-        heind = []
-        if node[0]-2>=0 and visited[node[0]-2][node[1]] != 1:
-            he.append((node[0]-2,node[1]))
-            heind.append(weightNode+field[node[0]-1][node[1]])
-        if node[1]-2>=0 and visited[node[0]][node[1]-2] != 1:
-            he.append((node[0],node[1]-2))
-            heind.append(weightNode+field[node[0]][node[1]-1])
-        if node[0]+2<len(field) and visited[node[0]+2][node[1]] != 1:
-            he.append((node[0]+2,node[1]))
-            heind.append(weightNode+field[node[0]+1][node[1]])
-        if node[1]+2<len(field[0]) and visited[node[0]][node[1]+2] != 1:
-            he.append((node[0],node[1]+2))
-            heind.append(weightNode+field[node[0]][node[1]+1])
+        tempArray = []
+        tempWeightIndexesArray = []
+        if node.X - 2 >= 0 and visited[node.X - 2][node.Y] != 1:
+            tempArray.append(Node(node.X - 2, node.Y,node))
+            asd = field[node.X - 1][node.Y]
+            tempWeightIndexesArray.append(weightNode + field[node.X - 1][node.Y])
+        if node.Y - 2 >= 0 and visited[node.X][node.Y - 2] != 1:
+            tempArray.append(Node(node.X, node.Y - 2,node))
+            asd = field[node.X][node.Y - 1]
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y - 1])
+        if node.X + 2 < len(field) and visited[node.X + 2][node.Y] != 1:
+            tempArray.append(Node(node.X + 2, node.Y,node))
+            asd = field[node.X + 1][node.Y]
+            tempWeightIndexesArray.append(weightNode + field[node.X + 1][node.Y])
+        if node.Y + 2 < len(field[0]) and visited[node.X][node.Y + 2] != 1:
+            tempArray.append(Node(node.X, node.Y + 2,node))
+            asd = field[node.X][node.Y + 1]
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y + 1])
+
+        while len(tempArray) > 0:
+            tempNode = tempArray.pop()
+            nodesList.append(tempNode)
+            nodesWeightsList.append(tempWeightIndexesArray.pop())
         
-
-        while len(he)>0:
-            
-            minIndex = heind.index(min(heind))
-            tempNode = he.pop(minIndex)
-            queue.append(tempNode)
-            queueWeight.append(heind.pop(minIndex))
-            
     # back to normal array
     a = []
-    for item in queue:
-     hehe = queue.pop()
-     a.append((int(hehe[0]/2),int(hehe[1]/2)))
+    for item in nodesList:
+        hehe = nodesList.pop()
+        a.append((int(hehe[0] / 2), int(hehe[1] / 2)))
     queue = a
     print(queue)
-    print(queueWeight)
-    for i in range(len(visited)-1):
+    print(nodesWeightsList)
+    for i in range(len(field) - 1):
         if i % 2 == 0:
             print()
-            for j in range(len(visited[0])-1):
-                if j%2 == 0:
-                  print(visited[i][j],end='')
-    
+            for j in range(len(field[0]) - 1):
+                if j % 2 == 0:
+                    print(field[i][j], end='')
+
     for i in range(len(visited)):
         print(visited[i])
         
@@ -228,6 +230,14 @@ def randomizeWeights(field):
         visitedFieldBig.append(clearRow)
 
     return newField,visitedFieldBig
+
+def reconstructPathForUCS(node):
+    queue = []
+    while(node != None):
+        queue.append((node.X/2,node.Y/2))
+        node = node.Node
+    return queue
+
 
 #reconstruct path to DFS algorithm 
 def reconstructPath(maze,x,y):
@@ -280,6 +290,6 @@ class Node:
             return b
      
 #trash
-# print(UCS(testGrid,2,0,24,20))
+#print(UCS(testGrid,2,0,24,20))
 # (findPathDFS(testGrid,2,1,0,0))
 # (findPathBFS(testGrid,2,1,16,16))
