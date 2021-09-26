@@ -32,8 +32,8 @@ def findPathBFS(maze,startX,startY,endX,endY):
 
     queue = []
     queue.append((startX,startY))
-    envHight = len(testGrid)
-    envWidth = len(testGrid[0])
+    envHight = len(maze)
+    envWidth = len(maze[0])
     Dir = [[-1, 0], [0, -1], [1, 0],[0, 1]]
     weight = 1
 
