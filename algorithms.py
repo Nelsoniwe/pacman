@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
 import sys
+import tabulate
 
 testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
@@ -21,6 +22,34 @@ testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,),
                  (1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,),
                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
+
+testGrid =      ((100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
+                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100))
 
 #BFS
 def findPathBFS(maze,startX,startY,endX,endY):
@@ -56,9 +85,10 @@ def findPathBFS(maze,startX,startY,endX,endY):
 
         if (p[0] == endX and p[1]== endY):
             endTime = datetime.now()
+            queue = reconstructPath(visited,p[0],p[1])
             print('time of work BFS:', endTime - startTime)
             print('path:', queue)
-            return reconstructPath(visited,p[0],p[1])
+            return queue
   
         for item in range(4):
             # using the direction array
@@ -126,7 +156,11 @@ def goTo(startX,startY,endX,endY,visited,queue,allPath):
     queue.pop()
     return
 
+def heuristic(a, b):
+   return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
 def UCS(maze, startX, startY, endX, endY):
+   
     startX = int(startX)*2
     startY = int(startY)*2
     endX = int(endX)*2
@@ -143,6 +177,92 @@ def UCS(maze, startX, startY, endX, endY):
     # randomize weights for fields
     field, visited = randomizeWeights(maze)
 
+
+    startTime = datetime.now()
+    startNode = None
+    # nodeList = []
+    # nodeList.append(startNode)
+    while len(nodesList) > 0:
+        minIndex = nodesWeightsList.index(min(nodesWeightsList))
+        print(nodesWeightsList)
+        node = nodesList[minIndex]
+        weightNode = nodesWeightsList[minIndex]
+        field[node.X][node.Y] = weightNode 
+        nodesWeightsList[minIndex] = sys.maxsize
+
+        startNode = Node(node.X, node.Y, startNode)
+        visited[node.X][node.Y] = 1
+
+        # a = []
+        # b = []
+        # for i in range(len(field) - 1):
+        #     if i % 2 == 0:
+        #         a.append([])
+        #         b.append([])
+        #         for j in range(len(field[0]) - 1):
+        #             if j % 2 == 0:
+        #                 a[-1].append((field[i][j]))
+        #                 b[-1].append((visited[i][j]))
+        
+        # print(tabulate.tabulate(a))
+        # print(tabulate.tabulate(b))
+
+        # startNode = Node(pathNode.X,pathNode.Y,pathNode.Node)
+        # nodeList.append(startNode)
+
+        # if we find endpoint
+        if node.X == endX and node.Y == endY:
+            endTime = datetime.now()
+            print('time of work UCS:', endTime - startTime)
+            queue = reconstructPathForUCS(node)
+            print('path:', queue)
+            return queue, field
+
+        tempArray = []
+        tempWeightIndexesArray = []
+        if node.X - 2 >= 0 and visited[node.X - 2][node.Y] != 1:
+            tempArray.append(Node(node.X - 2, node.Y,node))
+            asd = field[node.X - 1][node.Y]
+            tempWeightIndexesArray.append(weightNode + field[node.X - 1][node.Y])
+        if node.Y - 2 >= 0 and visited[node.X][node.Y - 2] != 1:
+            tempArray.append(Node(node.X, node.Y - 2,node))
+            asd = field[node.X][node.Y - 1] 
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y - 1])
+        if node.X + 2 < len(field) and visited[node.X + 2][node.Y] != 1:
+            tempArray.append(Node(node.X + 2, node.Y,node))
+            asd = field[node.X + 1][node.Y]
+            tempWeightIndexesArray.append(weightNode + field[node.X + 1][node.Y])
+        if node.Y + 2 < len(field[0]) and visited[node.X][node.Y + 2] != 1:
+            print("len field = " + str(len(field[0])))
+            tempArray.append(Node(node.X, node.Y + 2,node))
+            asd = field[node.X][node.Y + 1]
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y + 1])
+
+        while len(tempArray) > 0:
+            tempNode = tempArray.pop()
+            nodesList.append(tempNode)
+            nodesWeightsList.append(tempWeightIndexesArray.pop())
+        
+def Astar(maze, startX, startY, endX, endY):
+   
+    startX = int(startX)*2
+    startY = int(startY)*2
+    endX = int(endX)*2
+    endY = int(endY)*2
+
+    # list of Nodes (with coordinates)
+    nodesList = []
+    # Nodes weights
+    nodesWeightsList = []
+
+    nodesList.append(Node(startX, startY, None))
+    nodesWeightsList.append(0)
+
+    # randomize weights for fields
+    field, visited = randomizeWeights(maze)
+
+
+    startTime = datetime.now()
     startNode = None
     # nodeList = []
     # nodeList.append(startNode)
@@ -151,6 +271,7 @@ def UCS(maze, startX, startY, endX, endY):
         minIndex = nodesWeightsList.index(min(nodesWeightsList))
         node = nodesList[minIndex]
         weightNode = nodesWeightsList[minIndex]
+        field[node.X][node.Y] = weightNode 
         nodesWeightsList[minIndex] = sys.maxsize
 
         startNode = Node(node.X, node.Y, startNode)
@@ -161,26 +282,31 @@ def UCS(maze, startX, startY, endX, endY):
 
         # if we find endpoint
         if node.X == endX and node.Y == endY:
-            return reconstructPathForUCS(node)
+            endTime = datetime.now()
+            print('time of work Astar:', endTime - startTime)
+            
+            queue = reconstructPathForUCS(node)
+            print('path:', queue)
+            return queue, field
 
         tempArray = []
         tempWeightIndexesArray = []
         if node.X - 2 >= 0 and visited[node.X - 2][node.Y] != 1:
             tempArray.append(Node(node.X - 2, node.Y,node))
-            asd = field[node.X - 1][node.Y]
-            tempWeightIndexesArray.append(weightNode + field[node.X - 1][node.Y])
+            asd = field[node.X - 1][node.Y] 
+            tempWeightIndexesArray.append(weightNode + field[node.X - 1][node.Y]+ heuristic((node.X - 1,node.Y),(endX,endY)))
         if node.Y - 2 >= 0 and visited[node.X][node.Y - 2] != 1:
             tempArray.append(Node(node.X, node.Y - 2,node))
-            asd = field[node.X][node.Y - 1]
-            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y - 1])
+            asd = field[node.X][node.Y - 1] 
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y - 1]+ heuristic((node.X,node.Y - 1),(endX,endY)))
         if node.X + 2 < len(field) and visited[node.X + 2][node.Y] != 1:
             tempArray.append(Node(node.X + 2, node.Y,node))
             asd = field[node.X + 1][node.Y]
-            tempWeightIndexesArray.append(weightNode + field[node.X + 1][node.Y])
+            tempWeightIndexesArray.append(weightNode + field[node.X + 1][node.Y]+ heuristic((node.X + 1,node.Y),(endX,endY)))
         if node.Y + 2 < len(field[0]) and visited[node.X][node.Y + 2] != 1:
             tempArray.append(Node(node.X, node.Y + 2,node))
             asd = field[node.X][node.Y + 1]
-            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y + 1])
+            tempWeightIndexesArray.append(weightNode + field[node.X][node.Y + 1]+ heuristic((node.X,node.Y + 1),(endX,endY)))
 
         while len(tempArray) > 0:
             tempNode = tempArray.pop()
@@ -204,7 +330,9 @@ def UCS(maze, startX, startY, endX, endY):
 
     for i in range(len(visited)):
         print(visited[i])
-        
+
+
+    
 def randomizeWeights(field):
     newField = []
     visitedFieldBig = []
@@ -217,6 +345,8 @@ def randomizeWeights(field):
             if (i % 2 == 0) and (j % 2 == 0):
                 row.append(field[int(i/2)][int(j/2)])
                 if(field[int(i/2)][int(j/2)] == 1):
+                    clearRow.append(0)
+                elif(field[int(i/2)][int(j/2)] == 2):
                     clearRow.append(0)
                 else:
                     clearRow.append(1)
