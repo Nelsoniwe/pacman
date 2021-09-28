@@ -30,7 +30,9 @@ class Game(object):
         self.field = []
         self.calculatePath = False
         self.weightField = []
-        self.Astar = False
+        self.heuristicCalc = False
+        self.euclideanCalc = False
+        self.euclideanSquaredCalc = False
 
         for i,row in enumerate(testGrid):
             for j,item in enumerate(row):
@@ -80,7 +82,11 @@ class Game(object):
                 elif event.key == pygame.K_p:
                     self.calculatePath = True
                 elif event.key == pygame.K_o:
-                    self.Astar = True
+                    self.heuristicCalc = True
+                elif event.key == pygame.K_i:
+                    self.euclideanCalc = True
+                elif event.key == pygame.K_u:
+                    self.euclideanSquaredCalc = True
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
@@ -140,28 +146,28 @@ class Game(object):
         
 
 
-
+        self.field = []
         if self.calculatePath == True:
-        #    self.arra = algorithms.findPathBFS(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            # self.arra, self.field = algorithms.UCS(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            if self.Astar == True:
-                self.arra, self.field  = algorithms.Astar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-            else:
-                self.arra, self.field = algorithms.UCS(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
-        #    self.arra = algorithms.findPathDFS(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+            #    self.arra = algorithms.findPathBFS(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32)
+            if self.heuristicCalc:
+                self.arra, self.field  = algorithms.Astar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32,algorithms.heuristic)
+                self.heuristicCalc = False
+            elif self.euclideanCalc:
+                self.arra, self.field  = algorithms.Astar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32,algorithms.euclidean)
+                self.euclideanCalc = False
+            elif self.euclideanSquaredCalc:
+                self.arra, self.field  = algorithms.Astar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,food[1]/32,food[0]/32,algorithms.euclideanSquared)
+                self.euclideanSquaredCalc = False
+                self.field *= 10
             self.calculatePath = False
 
             self.weightField = []
-            for i in range(len(self.field) ):
+            for i in range(len(self.field)):
               if i % 2 == 0:
                   self.weightField.append([])
                   for j in range(len(self.field[0]) ):
                       if j % 2 == 0:
                           self.weightField[-1].append(self.field[i][j])
-
-            # for x in range(len(self.field)):
-            #     for y in range(len(self.field[0])):
-            #         self.weightField.append((x,y))
 
             for i in range(len(self.weightField)):
                 for j in range(len(self.weightField[0])):
@@ -169,14 +175,12 @@ class Game(object):
                       self.weightField[i][j] = 250
         
 
-        # self.lock = False
         for item in self.arra:
             pygame.draw.rect(screen, BLUE, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
-            # for item in arrb:
-            #     pygame.draw.rect(screen, YELLOW, pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 16, 16))
+
         for i in range(len(self.weightField)):
             for j in range(len(self.weightField[0])):
-                pygame.draw.rect(screen, (self.weightField[i][j],self.weightField[i][j],self.weightField[i][j]), pygame.Rect(j*32 + 9, i*32 + 9, 13, 13))
+                pygame.draw.rect(screen, (self.weightField[i][j],self.weightField[i][j],self.weightField[i][j]), pygame.Rect(j*32 + 12, i*32 + 12, 8, 8))
 
 
         

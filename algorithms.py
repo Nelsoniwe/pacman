@@ -159,6 +159,14 @@ def goTo(startX,startY,endX,endY,visited,queue,allPath):
 def heuristic(a, b):
    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
+# Евклідова відстань
+def euclidean(a, b):
+    return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+
+# Евклідова квадратична відстань
+def euclideanSquared(a, b):
+    return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+
 def UCS(maze, startX, startY, endX, endY):
    
     startX = int(startX)*2
@@ -193,23 +201,6 @@ def UCS(maze, startX, startY, endX, endY):
         startNode = Node(node.X, node.Y, startNode)
         visited[node.X][node.Y] = 1
 
-        # a = []
-        # b = []
-        # for i in range(len(field) - 1):
-        #     if i % 2 == 0:
-        #         a.append([])
-        #         b.append([])
-        #         for j in range(len(field[0]) - 1):
-        #             if j % 2 == 0:
-        #                 a[-1].append((field[i][j]))
-        #                 b[-1].append((visited[i][j]))
-        
-        # print(tabulate.tabulate(a))
-        # print(tabulate.tabulate(b))
-
-        # startNode = Node(pathNode.X,pathNode.Y,pathNode.Node)
-        # nodeList.append(startNode)
-
         # if we find endpoint
         if node.X == endX and node.Y == endY:
             endTime = datetime.now()
@@ -243,7 +234,7 @@ def UCS(maze, startX, startY, endX, endY):
             nodesList.append(tempNode)
             nodesWeightsList.append(tempWeightIndexesArray.pop())
         
-def Astar(maze, startX, startY, endX, endY):
+def Astar(maze, startX, startY, endX, endY, heuristic):
    
     startX = int(startX)*2
     startY = int(startY)*2
