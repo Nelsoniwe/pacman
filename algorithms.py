@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 import sys
 import tabulate
+import numpy as np
 
 testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
@@ -23,33 +24,6 @@ testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,),
                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
 
-testGrid =      ((100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100),
-                 (100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100))
 
 #BFS
 def findPathBFS(maze,startX,startY,endX,endY):
@@ -156,14 +130,15 @@ def goTo(startX,startY,endX,endY,visited,queue,allPath):
     queue.pop()
     return
 
+# manhattan
 def heuristic(a, b):
    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-# Евклідова відстань
+# euclidean
 def euclidean(a, b):
     return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
 
-# Евклідова квадратична відстань
+# euclidean Squared
 def euclideanSquared(a, b):
     return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
 
@@ -185,11 +160,9 @@ def UCS(maze, startX, startY, endX, endY):
     # randomize weights for fields
     field, visited = randomizeWeights(maze)
 
-
     startTime = datetime.now()
     startNode = None
-    # nodeList = []
-    # nodeList.append(startNode)
+
     while len(nodesList) > 0:
         minIndex = nodesWeightsList.index(min(nodesWeightsList))
         print(nodesWeightsList)
@@ -273,11 +246,11 @@ def Astar(maze, startX, startY, endX, endY, heuristic):
 
         # if we find endpoint
         if node.X == endX and node.Y == endY:
-            endTime = datetime.now()
-            print('time of work Astar:', endTime - startTime)
+            # endTime = datetime.now()
+            # print('time of work Astar:', endTime - startTime)
             
             queue = reconstructPathForUCS(node)
-            print('path:', queue)
+            # print('path:', queue)
             return queue, field
 
         tempArray = []
@@ -322,7 +295,33 @@ def Astar(maze, startX, startY, endX, endY, heuristic):
     for i in range(len(visited)):
         print(visited[i])
 
+def range_sum(row):
+    # summing in range element
+    return sum([abs(sub[1] - sub[0]) for sub in row if sub[0] > i and sub[0] < j and sub[1] > i and sub[1] < j])
 
+def multyAStar(maze, startX, startY, endX, endY,pointsArr, heuristic):
+    path = []
+    temp = []
+    # temp.insert(0,(startX*32,startY*32))
+    for item in pointsArr:
+        temp.append((item.rect[0],item.rect[1]))
+    sorted(temp , key=lambda k: [k[1], k[0]])
+    # (startX*32,startY*32)
+    
+    # for item in pointsArr:
+    #     arra, field  = Astar(maze,startX,startY,item.rect[1]/32,item.rect[0]/32,heuristic)
+    #     startX = item.rect[1]/32
+    #     startY = item.rect[0]/32
+    #     path.append(arra)
+    for item in temp:
+        arra, field  = Astar(maze,startX,startY,item[1]/32,item[0]/32,heuristic)
+        startX = int(item[1]/32)
+        startY = int(item[0]/32)
+        path.append(arra)
+    if endX != None:
+        arra, field  = Astar(maze,startX,startY,endX,endY,heuristic)
+        path.append(arra)
+    return path,field
     
 def randomizeWeights(field):
     newField = []
@@ -369,7 +368,6 @@ def reconstructPath(maze,x,y):
     queue = []
     queue.append((x,y))
 
-    #maze[maze == True] = 0
     newArr = []
     for i in range(len(maze)):
         newArr.append([])
@@ -409,8 +407,4 @@ class Node:
           return self.name(b)
         else:
             return b
-     
-#trash
-#print(UCS(testGrid,2,0,24,20))
-# (findPathDFS(testGrid,2,1,0,0))
-# (findPathBFS(testGrid,2,1,16,16))
+    

@@ -1,27 +1,5 @@
 import random
 import numpy as np
-maze =      ((0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,),
-             (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,))
-
-
-# print(maze)
 
 #19 x 17
 
@@ -52,8 +30,14 @@ def DFSGo(betwX,betwY,startX,startY,visited,queue,maze):
     queue, visited
     if startX < 0 or startY < 0 or startX > len(visited)-1 or startY > len(visited[0])-1:
         return
-    if (startX, startY) in queue or visited[startX][startY] > 0:
+    
+    if (startX, startY) in queue:
         return
+    
+    if visited[startX][startY] > 0:
+        if(random.randint(0,100)>20):
+            return
+            
     queue.append((startX, startY))
     visited[startX][startY] = 1
     visited[betwX][betwY] = 1
@@ -75,10 +59,3 @@ def DFSGo(betwX,betwY,startX,startY,visited,queue,maze):
 
     queue.pop()
     return maze.copy()
-
-# a = generateMaze(19,17)
-
-# for item in a:
-#     print()
-#     for i in item:
-#      print(i, end = '')
