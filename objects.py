@@ -1,9 +1,11 @@
+import random
 import pygame
 import algorithms
 import labirinthalg
+import enum
 
-SCREENWIDTH = 608
-SCREENHEIGHT = 544
+SCREENWIDTH = 544
+SCREENHEIGHT = 608
 
 # Define some colors
 BLACK = (0,0,0)
@@ -11,8 +13,28 @@ BLUE = (0,0,255)
 RED = (255,0,0)
 
 
-testGrid = labirinthalg.generateMaze(19,17)
-testGrid[10][10] = 2
+# testGrid = labirinthalg.generateMaze(19,17)
+# testGrid[10][10] = 2
+
+testGrid =      ((4,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+                 (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
+                 (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
+                 (1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,),
+                 (1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,),
+                 (0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,),
+                 (0,0,0,1,0,1,1,1,1,1,1,1,0,1,0,0,0,),
+                 (0,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,0,),
+                 (1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,),
+                 (0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,),
+                 (0,0,0,1,0,1,1,1,1,1,1,1,0,1,0,0,0,),
+                 (0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,),
+                 (1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+                 (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
+                 (1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,),
+                 (0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,),
+                 (1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,),
+                 (1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,),
+                 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
 
 #environment hight and width
 envHight = len(testGrid)
@@ -38,14 +60,72 @@ class Ellipse(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
 
+
+class TypeOfGhost(enum.Enum):
+    randomType = 0
+    directType = 1
+
+
 #Enemies   
 class Ghost(pygame.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self,x,y,t):
         pygame.sprite.Sprite.__init__(self)
         #image of ghost
         self.image = pygame.image.load("Ghost.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
+        self.path = []
+        self.speed = 2
+        self.oldPoint = (0,0)
+        self.newPoint = (0,0)
+        self.type = t #0 - random, 1 - direct
+
+    
+    changeX = 0
+    changeY = 0
+
+    def update(self,point):
+        
+        self.newPoint = point
+
+        if len(self.path) == 0 or self.newPoint != self.oldPoint:
+            self.path = algorithms.findPathBFS(testGrid,(self.rect.y+16)/32,(self.rect.x+16)/32,point[0],point[1])
+            self.oldPoint = self.newPoint
+            self.path.reverse()
+        self.goTo(self.path)
+
+        self.rect.x += self.changeX
+        self.rect.y += self.changeY
+                
+
+    def goTo(self,path):
+        if len(path) >= 1:
+            next = path[0]
+            x = ((self.rect.x)/32)
+            y = ((self.rect.y)/32)
+
+            if next[1] == x and next[0] == y:
+                path.remove(next)
+                self.changeX = 0
+                self.changeY = 0
+                
+            else:
+                if abs(x - next[1]) == 0:
+                    self.changeX = 0
+                    if y - next[0] < 0:
+                        self.changeY = self.speed
+                    if y - next[0] > 0:
+                        self.changeY = -self.speed
+                if y - next[0] == 0:
+                    self.changeY = 0
+                    if x - next[1] < 0:
+                        self.changeX = self.speed
+                    if x - next[1] > 0:
+                        self.changeX = -self.speed
+                    
+        
+            
+
     
 #Draw walls
 def testDrawEnviroment(screen):

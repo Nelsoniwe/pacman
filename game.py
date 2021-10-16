@@ -45,11 +45,11 @@ class Game(object):
                     self.blocksGroup.add(Block(j*32+4,i*32+4,BLUE,24,24))
 
         #count of patch cells
-        pathCellCount = 0
+        self.pathCellCount = 0
         for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item != 0:
-                    pathCellCount=pathCellCount+1
+                    self.pathCellCount=self.pathCellCount+1
 
         
 
@@ -59,17 +59,28 @@ class Game(object):
                 if item == 2:
                     self.player = Player(j*32,i*32,"player.png")
                 if item == 3:
-                    self.enemies.add(Ghost(j*32,i*32))
+                    self.enemies.add(Ghost(j*32,i*32,0))
+                if item == 4:
+                    self.enemies.add(Ghost(j*32,i*32,1))
         
+        self.randEnemies = []
+        self.dirEnemies = []
+
+        for e in self.enemies:
+            if e.type == 0:
+                self.randEnemies.append(e)
+            else:
+                self.dirEnemies.append(e)
+
         
         #FOOD
-        foodCount = 4
+        foodCount = self.pathCellCount
         foodCords = []
         food = 0
         g = 0
 
         while g < foodCount:
-            a = random.randrange(0,pathCellCount)
+            a = random.randrange(0,self.pathCellCount)
             if not foodCords.__contains__(a):
                 foodCords.append(a)
                 g+=1
@@ -139,6 +150,32 @@ class Game(object):
             if len(self.dotsGroup)==0:
                 self.player.explosion = True
             self.gameOver = self.player.gameOver
+            
+            ind = random.randint(0,self.pathCellCount)
+            
+
+            # self.enemies.update(rp)
+
+            for ghost in self.randEnemies:
+                rp = ghost.oldPoint
+                if len(ghost.path) == 0:
+                   for i, row in enumerate(testGrid):
+                    for j, item in enumerate(row):
+                        if ind != 0:
+                            ind = ind - 1
+                            rp = (j,i)
+                ghost.update(rp)
+
+
+            for ghost in self.dirEnemies:
+                
+                rp = ((self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32)
+
+                ghost.update(rp)
+                
+                
+
+                
 
 
     def displayFrame(self,screen):
@@ -200,7 +237,10 @@ class Game(object):
                  
         for i in range(len(self.weightField)):
             for j in range(len(self.weightField[0])):
-                pygame.draw.rect(screen, (self.weightField[i][j],self.weightField[i][j],self.weightField[i][j]), pygame.Rect(j*32 + 12, i*32 + 12, 8, 8))
+                x = self.weightField[i][j] *10
+                if x > 255:
+                  x = 255 
+                pygame.draw.rect(screen, (x,x,x), pygame.Rect(j*32 + 12, i*32 + 12, 8, 8))
 
 
         #draw food

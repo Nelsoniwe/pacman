@@ -4,6 +4,26 @@ import sys
 import tabulate
 import numpy as np
 
+# testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+#                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
+#                  (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
+#                  (1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,),
+#                  (1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,),
+#                  (0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,),
+#                  (0,0,0,1,0,1,1,1,1,1,1,1,0,1,0,0,0,),
+#                  (0,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,0,),
+#                  (1,1,1,1,1,1,0,3,3,3,0,1,1,1,1,1,1,),
+#                  (0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,),
+#                  (0,0,0,1,0,1,1,1,1,1,1,1,0,1,0,0,0,),
+#                  (0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,),
+#                  (1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
+#                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
+#                  (1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,),
+#                  (0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,),
+#                  (1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,),
+#                  (1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,),
+#                  (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))
+
 testGrid =      ((1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,),
                  (1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,),
                  (1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,),
@@ -60,8 +80,8 @@ def findPathBFS(maze,startX,startY,endX,endY):
         if (p[0] == endX and p[1]== endY):
             endTime = datetime.now()
             queue = reconstructPath(visited,p[0],p[1])
-            print('time of work BFS:', endTime - startTime)
-            print('path:', queue)
+            # print('time of work BFS:', endTime - startTime)
+            # print('path:', queue)
             return queue
   
         for item in range(4):
@@ -177,9 +197,9 @@ def UCS(maze, startX, startY, endX, endY):
         # if we find endpoint
         if node.X == endX and node.Y == endY:
             endTime = datetime.now()
-            print('time of work UCS:', endTime - startTime)
+            # print('time of work UCS:', endTime - startTime)
             queue = reconstructPathForUCS(node)
-            print('path:', queue)
+            # print('path:', queue)
             return queue, field
 
         tempArray = []
@@ -241,16 +261,9 @@ def Astar(maze, startX, startY, endX, endY, heuristic):
         startNode = Node(node.X, node.Y, startNode)
         visited[node.X][node.Y] = 1
 
-        # startNode = Node(pathNode.X,pathNode.Y,pathNode.Node)
-        # nodeList.append(startNode)
-
         # if we find endpoint
         if node.X == endX and node.Y == endY:
-            # endTime = datetime.now()
-            # print('time of work Astar:', endTime - startTime)
-            
             queue = reconstructPathForUCS(node)
-            # print('path:', queue)
             return queue, field
 
         tempArray = []
@@ -276,24 +289,6 @@ def Astar(maze, startX, startY, endX, endY, heuristic):
             tempNode = tempArray.pop()
             nodesList.append(tempNode)
             nodesWeightsList.append(tempWeightIndexesArray.pop())
-        
-    # back to normal array
-    a = []
-    for item in nodesList:
-        hehe = nodesList.pop()
-        a.append((int(hehe[0] / 2), int(hehe[1] / 2)))
-    queue = a
-    print(queue)
-    print(nodesWeightsList)
-    for i in range(len(field) - 1):
-        if i % 2 == 0:
-            print()
-            for j in range(len(field[0]) - 1):
-                if j % 2 == 0:
-                    print(field[i][j], end='')
-
-    for i in range(len(visited)):
-        print(visited[i])
 
 def range_sum(row):
     # summing in range element
@@ -306,13 +301,8 @@ def multyAStar(maze, startX, startY, endX, endY,pointsArr, heuristic):
     for item in pointsArr:
         temp.append((item.rect[0],item.rect[1]))
     sorted(temp , key=lambda k: [k[1], k[0]])
-    # (startX*32,startY*32)
-    
-    # for item in pointsArr:
-    #     arra, field  = Astar(maze,startX,startY,item.rect[1]/32,item.rect[0]/32,heuristic)
-    #     startX = item.rect[1]/32
-    #     startY = item.rect[0]/32
-    #     path.append(arra)
+
+
     for item in temp:
         arra, field  = Astar(maze,startX,startY,item[1]/32,item[0]/32,heuristic)
         startX = int(item[1]/32)
@@ -387,7 +377,7 @@ def reconstructPath(maze,x,y):
             b = p[1] + Dir[item][1]
 
             # not blocked and valid
-            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and maze[a][b] != 0 and maze[a][b] < maze[p[0]][p[1]]) :           
+            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and maze[a][b] > 0 and maze[a][b] < maze[p[0]][p[1]]) :           
                 queue.append((a, b))
                 #print(maze[a][b])
                 break
