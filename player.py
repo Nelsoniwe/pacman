@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
     changeY = 0
     explosion = False
     gameOver = False
-    def __init__(self,x,y,filename):
+    def __init__(self,x,y,filename,gameControled = False):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(filename).convert()
         self.image.set_colorkey(BLACK)
@@ -31,6 +31,9 @@ class Player(pygame.sprite.Sprite):
         # Save the player image
         self.playerImage = pygame.image.load(filename).convert()
         self.playerImage.set_colorkey(BLACK)
+        self.gameControled = gameControled
+        self.isGoingByGame = True
+
 
     def update(self,blockedBlocks):
         if not self.explosion:
@@ -81,19 +84,42 @@ class Player(pygame.sprite.Sprite):
                 self.gameOver = True
             self.explosionAnimation.update(12)
             self.image = self.explosionAnimation.getCurrentImage()
-            
+
+
+    def goTo(self,point):
+        x = ((self.rect.x)/32)
+        y = ((self.rect.y)/32)
+
+        if (point.Y) == x and (point.X) == y:
+            self.changeX = 0
+            self.changeY = 0
+            self.isGoingByGame = False
+        if abs((x) - point.Y) == 0:
+            self.changeX = 0
+            if y - point.X < 0:
+                self.moveDown()
+            if y - point.X > 0:
+                self.moveUp()
+        if (y) - point.X == 0:
+            self.changeY = 0
+            if x - point.Y < 0:
+                self.moveRight()
+            if x - point.Y > 0:
+                self.moveLeft()
+        
+
 
     def moveRight(self):
-        self.changeX = 3
+        self.changeX = 2
 
     def moveLeft(self):
-        self.changeX = -3
+        self.changeX = -2
 
     def moveUp(self):
-        self.changeY = -3
+        self.changeY = -2
 
     def moveDown(self):
-        self.changeY = 3
+        self.changeY = 2
 
     def stopMoveRight(self):
         if self.changeX != 0:

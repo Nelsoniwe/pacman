@@ -7,6 +7,8 @@ from pygame.surfarray import array2d
 from player import Player
 from objects import *
 import random
+import maxalgs
+
 SCREENWIDTH = 608
 SCREENHEIGHT = 544
 
@@ -38,6 +40,7 @@ class Game(object):
         self.euclideanSquaredCalc = False
         self.path = []
         self.mousePoint = None
+        
 
         for i,row in enumerate(testGrid):
             for j,item in enumerate(row):
@@ -57,7 +60,7 @@ class Game(object):
         for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item == 2:
-                    self.player = Player(j*32,i*32,"player.png")
+                    self.player = Player(j*32,i*32,"player.png",True)
                 if item == 3:
                     self.enemies.add(Ghost(j*32,i*32,0))
                 if item == 4:
@@ -91,6 +94,9 @@ class Game(object):
                     food+=1
                     if foodCords.__contains__(food):
                         self.dotsGroup.add(Ellipse(j*32+12,i*32+12,RED,8,8))
+        
+
+        self.PointToGoPlayer = maxalgs.minimax(testGrid,self.player,self.enemies,self.dotsGroup)
 
         
 
@@ -101,25 +107,19 @@ class Game(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
+                
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.player.moveRight()
-                elif event.key == pygame.K_LEFT:
-                    self.player.moveLeft()
-                elif event.key == pygame.K_UP:
-                    self.player.moveUp()
-                elif event.key == pygame.K_DOWN:
-                    self.player.moveDown()
-                elif event.key == pygame.K_ESCAPE:
+                if self.player.gameControled == False:
+                    if event.key == pygame.K_RIGHT:
+                        self.player.moveRight()
+                    elif event.key == pygame.K_LEFT:
+                        self.player.moveLeft()
+                    elif event.key == pygame.K_UP:
+                        self.player.moveUp()
+                    elif event.key == pygame.K_DOWN:
+                        self.player.moveDown()
+                if event.key == pygame.K_ESCAPE:
                     self.gameOver = True
-                elif event.key == pygame.K_p:
-                    self.calculatePath = True
-                elif event.key == pygame.K_o:
-                    self.heuristicCalc = True
-                elif event.key == pygame.K_i:
-                    self.euclideanCalc = True
-                elif event.key == pygame.K_u:
-                    self.euclideanSquaredCalc = True
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
@@ -130,8 +130,9 @@ class Game(object):
                     self.player.stopMoveUp()
                 elif event.key == pygame.K_DOWN:
                     self.player.stopMoveDown()
-                elif event.key == pygame.K_o:
-                    self.Astar = False
+                # elif event.key == pygame.K_o:
+                #     self.Astar = False
+            
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # self.player.explosion = True
@@ -168,10 +169,16 @@ class Game(object):
 
 
             for ghost in self.dirEnemies:
-                
                 rp = ((self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32)
-
                 ghost.update(rp)
+
+            
+
+            if self.player.gameControled:
+                if self.player.isGoingByGame == False:
+                  self.PointToGoPlayer = maxalgs.minimax(testGrid,self.player,self.enemies,self.dotsGroup)
+                  self.player.isGoingByGame = True
+                self.player.goTo(self.PointToGoPlayer)
                 
                 
 
@@ -202,45 +209,45 @@ class Game(object):
 
         if self.calculatePath == True:
             self.path = []
-            if self.heuristicCalc:
-                self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.heuristic)
-            elif self.euclideanCalc:
-                self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.euclidean)
-            elif self.euclideanSquaredCalc:
-                self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.euclideanSquared)
-                self.field *= 10
-            self.heuristicCalc = False
-            self.euclideanCalc = False
-            self.euclideanSquaredCalc = False
+            # if self.heuristicCalc:
+            #     self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.heuristic)
+            # elif self.euclideanCalc:
+            #     self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.euclidean)
+            # elif self.euclideanSquaredCalc:
+            #     self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.euclideanSquared)
+            #     self.field *= 10
+            # self.heuristicCalc = False
+            # self.euclideanCalc = False
+            # self.euclideanSquaredCalc = False
 
-            self.calculatePath = False
+            # self.calculatePath = False
 
-            self.weightField = []
-            for i in range(len(self.field)):
-              if i % 2 == 0:
-                  self.weightField.append([])
-                  for j in range(len(self.field[0]) ):
-                      if j % 2 == 0:
-                          self.weightField[-1].append(self.field[i][j])
+            # self.weightField = []
+            # for i in range(len(self.field)):
+            #   if i % 2 == 0:
+            #       self.weightField.append([])
+            #       for j in range(len(self.field[0]) ):
+            #           if j % 2 == 0:
+            #               self.weightField[-1].append(self.field[i][j])
 
-            for i in range(len(self.weightField)):
-                for j in range(len(self.weightField[0])):
-                    if self.weightField[i][j] > 250:
-                      self.weightField[i][j] = 250
+            # for i in range(len(self.weightField)):
+            #     for j in range(len(self.weightField[0])):
+            #         if self.weightField[i][j] > 250:
+            #           self.weightField[i][j] = 250
         
-        for i in self.arra:
-            for item in i:
-             a =  i.index(item)*10
-             if a > 255:
-               a = 255 
-             pygame.draw.rect(screen,(100,a,100) , pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 12,12))
+        # for i in self.arra:
+        #     for item in i:
+        #      a =  i.index(item)*10
+        #      if a > 255:
+        #        a = 255 
+        #      pygame.draw.rect(screen,(100,a,100) , pygame.Rect(item[1]*32 + 9, item[0]*32 + 9, 12,12))
                  
-        for i in range(len(self.weightField)):
-            for j in range(len(self.weightField[0])):
-                x = self.weightField[i][j] *10
-                if x > 255:
-                  x = 255 
-                pygame.draw.rect(screen, (x,x,x), pygame.Rect(j*32 + 12, i*32 + 12, 8, 8))
+        # for i in range(len(self.weightField)):
+        #     for j in range(len(self.weightField[0])):
+        #         x = self.weightField[i][j] *10
+        #         if x > 255:
+        #           x = 255 
+        #         pygame.draw.rect(screen, (x,x,x), pygame.Rect(j*32 + 12, i*32 + 12, 8, 8))
 
 
         #draw food

@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
 import sys
+from pygame.scrap import contains
 import tabulate
 import numpy as np
 
@@ -103,6 +104,62 @@ def findPathBFS(maze,startX,startY,endX,endY):
     
     return queue
 
+def findPathBFSNearestPoint(maze,startX,startY,Food):
+    startX = int(startX)
+    startY = int(startY)
+
+    ListWithCords = []
+
+    for item in Food:
+     ListWithCords.append(((item.rect.x-12)/32,(item.rect.y-12)/32))
+
+    queue = []
+    queue.append((startX,startY))
+    envHight = len(maze)
+    envWidth = len(maze[0])
+    Dir = [[-1, 0], [0, -1], [1, 0],[0, 1]]
+    weight = 1
+
+    visited = []
+    for i in range(len(maze)):
+        visited.append([])
+        for j in range(len(maze[i])):
+            if(maze[i][j]!=0):
+                visited[-1].append(0)
+            else:
+                visited[-1].append(True)
+
+    visited[startX][startY] = 1
+    oldCount = 1
+    newCount = 0
+    while len(queue)>0:
+        
+        p = queue[0]
+        queue.pop(0)
+
+        if ((p[1],p[0]) in ListWithCords):
+            return (p[1],p[0])
+  
+        for item in range(4):
+            # using the direction array
+            a = p[0] + Dir[item][0]
+            b = p[1] + Dir[item][1]
+
+            # not blocked and valid
+            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and visited[a][b] == 0 and visited[a][b] != True) :       
+                visited[a][b]= weight + 1   
+                queue.append((a, b))
+                newCount += 1
+        
+        oldCount -= 1
+        if(oldCount <= 0):
+            oldCount = newCount
+            newCount = 0
+            weight+=1
+    
+    return queue
+
+
 #DFS algorithm
 def findPathDFS(maze,startX,startY,endX,endY):
     startTime = datetime.now()
@@ -125,9 +182,10 @@ def findPathDFS(maze,startX,startY,endX,endY):
  
     goTo(startX,startY,endX,endY,visited,queue,allPath)
     endTime = datetime.now()
-    print('time of work DFS:', endTime - startTime)
-    print('path:', allPath[0])
-    return allPath[0]
+    # print('time of work DFS:', endTime - startTime)
+    # print('path:', allPath[0])
+    if len(allPath) > 0:
+        return allPath[0]
 
 #DFS algorithm
 def goTo(startX,startY,endX,endY,visited,queue,allPath):
@@ -151,8 +209,9 @@ def goTo(startX,startY,endX,endY,visited,queue,allPath):
     return
 
 # manhattan
-def heuristic(a, b):
-   return abs(a[0] - b[0]) + abs(a[1] - b[1])
+def heuristic(b, a):
+   i = abs(a[0] - b[0]) + abs(a[1] - b[1])
+   return i
 
 # euclidean
 def euclidean(a, b):
@@ -185,7 +244,6 @@ def UCS(maze, startX, startY, endX, endY):
 
     while len(nodesList) > 0:
         minIndex = nodesWeightsList.index(min(nodesWeightsList))
-        print(nodesWeightsList)
         node = nodesList[minIndex]
         weightNode = nodesWeightsList[minIndex]
         field[node.X][node.Y] = weightNode 
@@ -200,7 +258,7 @@ def UCS(maze, startX, startY, endX, endY):
             # print('time of work UCS:', endTime - startTime)
             queue = reconstructPathForUCS(node)
             # print('path:', queue)
-            return queue, field
+            return queue
 
         tempArray = []
         tempWeightIndexesArray = []
@@ -264,7 +322,7 @@ def Astar(maze, startX, startY, endX, endY, heuristic):
         # if we find endpoint
         if node.X == endX and node.Y == endY:
             queue = reconstructPathForUCS(node)
-            return queue, field
+            return queue
 
         tempArray = []
         tempWeightIndexesArray = []
@@ -358,6 +416,8 @@ def reconstructPath(maze,x,y):
     queue = []
     queue.append((x,y))
 
+    valid = False
+
     newArr = []
     for i in range(len(maze)):
         newArr.append([])
@@ -366,24 +426,29 @@ def reconstructPath(maze,x,y):
                 newArr[-1].append(0)
             else:
                 newArr[-1].append(maze[i][j])
+
+            if maze[i][j] == 2:
+                valid = True
     
     maze = newArr
+    if valid:
+        while stop:
+            p = queue[len(queue)-1]
+            for item in range(4):
+                # using the direction array
+                a = p[0] + Dir[item][0]
+                b = p[1] + Dir[item][1]
 
-    while stop:
-        p = queue[len(queue)-1]
-        for item in range(4):
-            # using the direction array
-            a = p[0] + Dir[item][0]
-            b = p[1] + Dir[item][1]
-
-            # not blocked and valid
-            if(a >= 0 and b >= 0 and a < envHight and b < envWidth and maze[a][b] > 0 and maze[a][b] < maze[p[0]][p[1]]) :           
-                queue.append((a, b))
-                #print(maze[a][b])
-                break
-        if(maze[p[0]][p[1]]==2):
-            stop = False
-    return (queue)
+                # not blocked and valid
+                if(a >= 0 and b >= 0 and a < envHight and b < envWidth and maze[a][b] > 0 and maze[a][b] < maze[p[0]][p[1]]) :           
+                    queue.append((a, b))
+                    #print(maze[a][b])
+                    break
+            if(maze[p[0]][p[1]]==2):
+                stop = False
+        return (queue)
+    else:
+        return (queue)
 
 class Node:
     def __init__(self, x, y, bNode = None):

@@ -24,7 +24,7 @@ def main():
         #draw frame
         game.displayFrame(screen)
         #30 frames per second
-        clock.tick(30)
+        clock.tick(1000)
     pygame.quit()
 
 if __name__ == '__main__':
