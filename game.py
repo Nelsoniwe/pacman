@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import NamedTuple
 from numpy import array, fabs, true_divide
 import numpy
@@ -7,7 +8,9 @@ from pygame.surfarray import array2d
 from player import Player
 from objects import *
 import random
+import pandas
 import maxalgs
+import csv
 
 SCREENWIDTH = 608
 SCREENHEIGHT = 544
@@ -20,6 +23,7 @@ RED = (255,0,0)
 
 class Game(object):
     def __init__(self):
+        self.timestart = datetime.now()
         self.lock = True
         self.font = pygame.font.Font(None,40)
         # Create the player
@@ -30,6 +34,13 @@ class Game(object):
         self.dotsGroup = pygame.sprite.Group()
         # Create a group for the ghosts
         self.enemies = pygame.sprite.Group()
+        #score
+        self.score = 0
+        # Create the font for displaying the score on the screen
+        self.font = pygame.font.Font(None,35)
+        self.isWin = False
+
+        self.ChoosenMaxAlg = maxalgs.minimax
 
         self.arra = []
         self.field = []
@@ -40,6 +51,9 @@ class Game(object):
         self.euclideanSquaredCalc = False
         self.path = []
         self.mousePoint = None
+
+        
+        self.timerToTakePoint = 30
         
 
         for i,row in enumerate(testGrid):
@@ -96,7 +110,7 @@ class Game(object):
                         self.dotsGroup.add(Ellipse(j*32+12,i*32+12,RED,8,8))
         
 
-        self.PointToGoPlayer = maxalgs.minimax(testGrid,self.player,self.enemies,self.dotsGroup)
+        self.PointToGoPlayer = self.ChoosenMaxAlg(testGrid,self.player,self.enemies,self.dotsGroup)
 
         
 
@@ -130,8 +144,8 @@ class Game(object):
                     self.player.stopMoveUp()
                 elif event.key == pygame.K_DOWN:
                     self.player.stopMoveDown()
-                # elif event.key == pygame.K_o:
-                #     self.Astar = False
+                elif event.key == pygame.K_o:
+                    self.ChoosenMaxAlg = maxalgs.expectimax
             
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -144,17 +158,24 @@ class Game(object):
         if not self.gameOver:
             self.player.update(self.blocksGroup)
             #detecting colide with ghost or food
-            blockHitList = pygame.sprite.spritecollide(self.player,self.dotsGroup,True)
+            dotsHitList = pygame.sprite.spritecollide(self.player,self.dotsGroup,True)
             blockHitList = pygame.sprite.spritecollide(self.player,self.enemies,False)
             if len(blockHitList) > 0:
                 self.player.explosion = True
             if len(self.dotsGroup)==0:
                 self.player.explosion = True
+                self.isWin = True
+            if len(dotsHitList)>0:
+                self.score += 10
             self.gameOver = self.player.gameOver
             
             ind = random.randint(0,self.pathCellCount)
             
 
+            self.timerToTakePoint-=1
+            if self.timerToTakePoint<=0:
+              self.timerToTakePoint = 30
+              self.score -=1
             # self.enemies.update(rp)
 
             for ghost in self.randEnemies:
@@ -176,9 +197,14 @@ class Game(object):
 
             if self.player.gameControled:
                 if self.player.isGoingByGame == False:
-                  self.PointToGoPlayer = maxalgs.minimax(testGrid,self.player,self.enemies,self.dotsGroup)
+                  self.PointToGoPlayer = self.ChoosenMaxAlg(testGrid,self.player,self.enemies,self.dotsGroup)
                   self.player.isGoingByGame = True
                 self.player.goTo(self.PointToGoPlayer)
+        else:
+            data = [self.ChoosenMaxAlg.__name__, self.isWin, datetime.now() - self.timestart, self.score]
+            with open('stats.csv', 'a', encoding='UTF8') as file:
+                writer = csv.writer(file)
+                writer.writerow(data)
                 
                 
 
@@ -197,18 +223,20 @@ class Game(object):
         screen.blit(self.player.image,self.player.rect)
         
 
-        for item in self.dotsGroup:
-         food = (item.rect)
-         break
-        endPos = [None,None]
-        if(self.mousePoint!=None and testGrid !=None):
-            if (testGrid[int(self.mousePoint[1]/32)][int(self.mousePoint[0]/32)]==1):  
-                endPos = (int(self.mousePoint[1]/32),int(self.mousePoint[0]/32))
+        # for item in self.dotsGroup:
+        #  food = (item.rect)
+        #  break
+        # endPos = [None,None]
+        # if(self.mousePoint!=None and testGrid !=None):
+        #     if (testGrid[int(self.mousePoint[1]/32)][int(self.mousePoint[0]/32)]==1):  
+        #         endPos = (int(self.mousePoint[1]/32),int(self.mousePoint[0]/32))
 
-        self.field = []
+        # self.field = []
+        text = self.font.render("Score: " + str(self.score),True,(0,255,0))
+        screen.blit(text,[120,20])
 
-        if self.calculatePath == True:
-            self.path = []
+        # if self.calculatePath == True:
+        #     self.path = []
             # if self.heuristicCalc:
             #     self.arra, self.field  = algorithms.multyAStar(testGrid,(self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32,endPos[0],endPos[1],self.dotsGroup,algorithms.heuristic)
             # elif self.euclideanCalc:
