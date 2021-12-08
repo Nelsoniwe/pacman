@@ -1,4 +1,3 @@
-
 import random
 from numpy import fabs, newaxis
 from numpy.core.fromnumeric import around
@@ -68,9 +67,7 @@ def minimax(field,player,enemies,foodList):
         if playerMoves.Value > finishNode:
           finishNode = playerMoves.Value
           finishCords = playerMoves
-
-
-
+          
     return finishCords
 
 

@@ -5,6 +5,8 @@ import numpy
 import pygame
 from pygame.constants import RESIZABLE
 from pygame.surfarray import array2d
+
+from algorithms import euclideanSquared, euclidean
 from player import Player
 from objects import *
 import random
@@ -12,14 +14,13 @@ import pandas
 import maxalgs
 import csv
 
-SCREENWIDTH = 608
-SCREENHEIGHT = 544
+SCREENWIDTH = 160
+SCREENHEIGHT = 160
 
 WHITE = (255,255,255)
 BLUE = (0,0,255)
 YELLOW = (255,255,0)
 RED = (255,0,0)
-
 
 class Game(object):
     def __init__(self):
@@ -40,7 +41,7 @@ class Game(object):
         self.font = pygame.font.Font(None,35)
         self.isWin = False
 
-        self.ChoosenMaxAlg = maxalgs.minimax
+        self.ChoosenMaxAlg = maxalgs.expectimax
 
         self.arra = []
         self.field = []
@@ -51,15 +52,14 @@ class Game(object):
         self.euclideanSquaredCalc = False
         self.path = []
         self.mousePoint = None
-
+        self.testGrid = testGrid
         
         self.timerToTakePoint = 30
         
-
         for i,row in enumerate(testGrid):
             for j,item in enumerate(row):
                 if item == 0:
-                    self.blocksGroup.add(Block(j*32+4,i*32+4,BLUE,24,24))
+                    self.blocksGroup.add(Block(j*32+4,i*32+4,BLUE,20,20))
 
         #count of patch cells
         self.pathCellCount = 0
@@ -68,17 +68,17 @@ class Game(object):
                 if item != 0:
                     self.pathCellCount=self.pathCellCount+1
 
-        
-
         # Add objects to the field
         for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item == 2:
-                    self.player = Player(j*32,i*32,"player.png",True)
+                    self.player = Player(j*32,i*32,"player.png",False)
                 if item == 3:
                     self.enemies.add(Ghost(j*32,i*32,0))
                 if item == 4:
                     self.enemies.add(Ghost(j*32,i*32,1))
+                if item == 5:
+                    self.dotsGroup.add(Ellipse(j * 32 + 12, i * 32 + 12, WHITE, 8, 8))
         
         self.randEnemies = []
         self.dirEnemies = []
@@ -88,10 +88,9 @@ class Game(object):
                 self.randEnemies.append(e)
             else:
                 self.dirEnemies.append(e)
-
         
         #FOOD
-        foodCount = self.pathCellCount
+        foodCount = 0
         foodCords = []
         food = 0
         g = 0
@@ -101,18 +100,34 @@ class Game(object):
             if not foodCords.__contains__(a):
                 foodCords.append(a)
                 g+=1
+
         #add food to the field
         for i, row in enumerate(testGrid):
             for j, item in enumerate(row):
                 if item != 0:
                     food+=1
                     if foodCords.__contains__(food):
-                        self.dotsGroup.add(Ellipse(j*32+12,i*32+12,RED,8,8))
+                        self.dotsGroup.add(Ellipse(j*32+12,i*32+12,WHITE,8,8))
         
+        #self.PointToGoPlayer = self.ChoosenMaxAlg(testGrid,self.player,self.enemies,self.dotsGroup)
 
-        self.PointToGoPlayer = self.ChoosenMaxAlg(testGrid,self.player,self.enemies,self.dotsGroup)
+    def PlayNextMove(self, action):
+        self.player.MoveToPosition(action)
+        PlayerXPos,PlayerYPos =  self.player.GetCordsInMaze()
+        nearestEnemy = maxalgs.FindNearestPoint([PlayerXPos, PlayerYPos], self.enemies)
+        nearestFood = maxalgs.FindNearestPoint([PlayerXPos,PlayerYPos], self.dotsGroup)
+        #[PlayerXPos, PlayerYPos, GhostXpoz, GhostYpoz, mazeMatrix, FoodCordsList]
+        return [self.ScoreCAlculate(nearestEnemy,nearestFood), PlayerXPos, PlayerYPos, nearestEnemy, nearestFood]
 
-        
+    def ScoreCAlculate(self,nearestEnemy,nearestFood):
+        PlayerXPos, PlayerYPos = self.player.GetCordsInMaze()
+        playerFoodDistance = euclideanSquared([PlayerXPos, PlayerYPos],nearestFood)
+        playerEnemyDistance = euclideanSquared([PlayerXPos, PlayerYPos],nearestEnemy)
+        #return  (10/(playerFoodDistance+1)) * playerEnemyDistance/10 - 10
+        a = self.score
+        self.score = 0
+        return a
+
 
     def inputHandler(self):
         if self.gameOver == True:
@@ -125,27 +140,32 @@ class Game(object):
             if event.type == pygame.KEYDOWN:
                 if self.player.gameControled == False:
                     if event.key == pygame.K_RIGHT:
-                        self.player.moveRight()
+                        #self.player.moveRight()
+                        self.player.MoveToPosition(2)
                     elif event.key == pygame.K_LEFT:
-                        self.player.moveLeft()
+                        #self.player.moveLeft()
+                        self.player.MoveToPosition(3)
                     elif event.key == pygame.K_UP:
-                        self.player.moveUp()
+                        #self.player.moveUp()
+                        self.player.MoveToPosition(0)
                     elif event.key == pygame.K_DOWN:
-                        self.player.moveDown()
+                        #self.player.moveDown()
+                        self.player.MoveToPosition(1)
                 if event.key == pygame.K_ESCAPE:
+                    self.score -= 100
                     self.gameOver = True
 
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT:
-                    self.player.stopMoveRight()
-                elif event.key == pygame.K_LEFT:
-                    self.player.stopMoveLeft()
-                elif event.key == pygame.K_UP:
-                    self.player.stopMoveUp()
-                elif event.key == pygame.K_DOWN:
-                    self.player.stopMoveDown()
-                elif event.key == pygame.K_o:
-                    self.ChoosenMaxAlg = maxalgs.expectimax
+            #elif event.type == pygame.KEYUP:
+            #    if event.key == pygame.K_RIGHT:
+            #        self.player.stopMoveRight()
+            #    elif event.key == pygame.K_LEFT:
+            #        self.player.stopMoveLeft()
+            #    elif event.key == pygame.K_UP:
+            #        self.player.stopMoveUp()
+            #    elif event.key == pygame.K_DOWN:
+            #        self.player.stopMoveDown()
+            #    elif event.key == pygame.K_o:
+            #        self.ChoosenMaxAlg = maxalgs.expectimax
             
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -166,16 +186,16 @@ class Game(object):
                 self.player.explosion = True
                 self.isWin = True
             if len(dotsHitList)>0:
-                self.score += 10
+                self.score += 50
             self.gameOver = self.player.gameOver
             
             ind = random.randint(0,self.pathCellCount)
-            
 
             self.timerToTakePoint-=1
             if self.timerToTakePoint<=0:
               self.timerToTakePoint = 30
-              self.score -=1
+              self.score -=30
+
             # self.enemies.update(rp)
 
             for ghost in self.randEnemies:
@@ -188,12 +208,9 @@ class Game(object):
                             rp = (j,i)
                 ghost.update(rp)
 
-
             for ghost in self.dirEnemies:
                 rp = ((self.player.rect.bottomright[1]-16)/32,(self.player.rect.bottomright[0]-16)/32)
                 ghost.update(rp)
-
-            
 
             if self.player.gameControled:
                 if self.player.isGoingByGame == False:
@@ -202,14 +219,10 @@ class Game(object):
                 self.player.goTo(self.PointToGoPlayer)
         else:
             data = [self.ChoosenMaxAlg.__name__, self.isWin, datetime.now() - self.timestart, self.score]
+            print(data)
             with open('stats.csv', 'a', encoding='UTF8') as file:
                 writer = csv.writer(file)
                 writer.writerow(data)
-                
-                
-
-                
-
 
     def displayFrame(self,screen):
         #clear screen from previous frame
@@ -231,9 +244,11 @@ class Game(object):
         #     if (testGrid[int(self.mousePoint[1]/32)][int(self.mousePoint[0]/32)]==1):  
         #         endPos = (int(self.mousePoint[1]/32),int(self.mousePoint[0]/32))
 
+        
+
         # self.field = []
         text = self.font.render("Score: " + str(self.score),True,(0,255,0))
-        screen.blit(text,[120,20])
+        screen.blit(text,[30,240])
 
         # if self.calculatePath == True:
         #     self.path = []
